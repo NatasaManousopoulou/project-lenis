@@ -13,6 +13,27 @@ const USER_QUERY = `query ($user_login:String!, $end_cursor:String){
     }
   }` + repositoryFragment;
 
+  const MS_USERS_QUERY = `query ($end_cursor:String){
+    search(query:"microsoft", type:USER, after:$end_cursor, first: 100) { 
+      pageInfo {
+        endCursor
+      }
+      nodes {
+        ... on User { 
+         name 
+         email
+         company 
+         organizations(first: 100) { 
+             nodes { 
+               name 
+             } 
+          }
+        }
+      } 
+    }
+  }`;
+
   module.exports = {
-    userQuery: USER_QUERY
+    userQuery: USER_QUERY,
+    msUsersQuery: MS_USERS_QUERY
   }
