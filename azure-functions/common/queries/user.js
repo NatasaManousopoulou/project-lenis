@@ -22,7 +22,13 @@ const USER_QUERY = `query ($user_login:String!, $end_cursor:String){
         ... on User { 
          name 
          email
-         company 
+         company
+         resourcePath
+         repositories(first: 100) {
+          nodes {
+            nameWithOwner
+          }
+         }
          organizations(first: 100) { 
              nodes { 
                name 

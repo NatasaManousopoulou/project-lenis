@@ -4,18 +4,33 @@ let gitHubHelper = require(`../common/githubGraphQL.js`);
 let exceptionHelper = require(`../common/exceptions.js`);
 let msUsersQuery = require(`../common/queries/user.js`).msUsersQuery;
 
-
+function isMicrosoftOrg(organization) {
+  return 
+    organization != null &&
+    organization != undefined &&
+    [ "microsoft", "azure", "azure-samples", "microsoftdocs", "dotnetcore", "dotnet" ].find((v) => v == organization.name.toLowerCase());
+}
 
 function processResult(graph, context) {
   let result = context.result;
   graph.data.search.nodes.forEach(r => { 
-    if (r.email != null && r.email.toLowerCase().trim().endsWith("@microsoft.com"))
+    if ((r.email != null && r.email.toLowerCase().trim().endsWith("@microsoft.com")) ||
+        (r.company != null && r.company.toLowerCase().indexOf("microsoft" >= 0)) ||
+        (r.organizations != null && r.organizations.nodes != null && r.organizations.nodes.some(isMicrosoftOrg))) {
+      delete r.organizations;
+      r.id = r.email;
+      r.repositories = r.repositories.nodes.map((n) => n.nameWithOwner);
       result.msUsers.push(r);
+    }
   });
-  if(graph.data.search.pageInfo.hasNextPage) {
-    executeQuery(result.login, graph.data.search.pageInfo.endCursor, context);
+
+  context.log(graph.data.search.nodes.length);
+  context.log(graph.data.search.pageInfo.endCursor);
+
+  if(graph.data.search.pageInfo.endCursor != null) {
+    executeQuery(graph.data.search.pageInfo.endCursor, context);
   } else {
-    context.bindings.msUsersDocument = JSON.stringify(result)
+    context.bindings.msUsersDocument = JSON.stringify(result.msUsers)
     context.done();
   }
 }
