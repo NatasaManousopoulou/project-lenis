@@ -13,23 +13,21 @@ const USER_QUERY = `query ($user_login:String!, $end_cursor:String){
     }
   }` + repositoryFragment;
 
-  const MS_USERS_QUERY = `query ($end_cursor:String){
-    search(query:"microsoft", type:USER, after:$end_cursor, first: 100) { 
+  const MS_USERS_QUERY = `query ($end_cursor:String, $page_size: Int!){
+    search(query:"microsoft", type:USER, after:$end_cursor, first: $page_size) { 
       pageInfo {
+        hasNextPage
         endCursor
       }
       nodes {
         ... on User { 
+         id
          name 
          email
          company
          resourcePath
-         repositories(first: 100) {
-          nodes {
-            nameWithOwner
-          }
-         }
-         organizations(first: 100) { 
+         
+         organizations(first: $page_size) { 
              nodes { 
                name 
              } 

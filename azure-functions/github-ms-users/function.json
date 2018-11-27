@@ -6,6 +6,13 @@
           "direction": "in"
         },
         {
+          "type": "queue",
+          "direction": "out",
+          "name": "githubRepositoriesStep2",
+          "queueName": "github-repositories-step2",
+          "connection": "AzureWebJobsStorage"
+        },
+        {
           "name": "msUsersDocument",
           "type": "cosmosDB",
           "databaseName": "project-lenis",

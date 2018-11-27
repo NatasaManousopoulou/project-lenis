@@ -39,6 +39,7 @@ function processResult(graph, context) {
             }
             else {
                 context.history[commit.author.user.login] = { 
+                    id: commit.author.user.id,
                     location : commit.author.user.location,  
                     contributions : 1
                 };               
