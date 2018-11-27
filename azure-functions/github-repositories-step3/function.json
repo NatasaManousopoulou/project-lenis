@@ -9,7 +9,7 @@
         },
         {
           "name": "githubRepositoriesDocument",
-          "type": "documentDB",
+          "type": "cosmosDB",
           "databaseName": "project-lenis",
           "collectionName": "githubRepositories",
           "createIfNotExists": true,
