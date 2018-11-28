@@ -34,6 +34,7 @@ const REPOSITORY_QUERY = `query ($repository_owner:String!, $repository_name:Str
                                message
                                author {
                                  user {
+                                    id
                                     login
                                     name
                                     location
