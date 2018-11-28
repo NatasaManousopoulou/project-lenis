@@ -27,7 +27,8 @@ function processResult(graph, context) {
 
             result.organizations.push( {
               "login": orgName,
-              "type": "user"
+              "type": "user",
+              "collectionSuffix": "MsUsers"
             });
 
             delete r.organizations;

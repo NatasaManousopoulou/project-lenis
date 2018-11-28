@@ -20,7 +20,7 @@ function entries (obj) {
 function done(context) {
     context.log(`Adding commits to cosmos db`);
     context.result[`history`] = entries(context.history);
-    context.bindings.githubRepositoriesDocument =  JSON.stringify(context.result);
+    context.bindings['githubRepositoriesDocument' + context.collectionSuffix] =  JSON.stringify(context.result);
     context.done();
 }
 
@@ -71,11 +71,20 @@ function executeQuery(repositoryOwner, repositoryName, endCursor, context) {
 
 module.exports = function (context) {
     try {
-        context[`result`] = context.bindings.githubRepositoriesStep3;
+        let repoDetails = context.bindings.githubRepositoriesStep3;
+
+        context[`result`] = repoDetails;
         context[`history`] = [];
         context[`nrOfCommits`] = 0;
+
+        context.collectionSuffix = 
+            (repoDetails.collectionSuffix != undefined && repoDetails.collectionSuffix != null && repoDetails.collectionSuffix.length > 0) ?
+                repoDetails.collectionSuffix :
+                "";
+            delete repoDetails.collectionSuffix;
+
         if (context.result.isFork == false) {
-            executeQuery(context.bindings.githubRepositoriesStep3.repositoryOwner, context.bindings.githubRepositoriesStep3.repositoryName, null, context);
+            executeQuery(repoDetails.repositoryOwner, repoDetails.repositoryName, null, context);
         }
         else {
             done(context);
@@ -83,5 +92,8 @@ module.exports = function (context) {
     } 
     catch(error) {
         exceptionHelper.raiseException(error, true, context);
+    }
+    finally{
+
     }
 }
