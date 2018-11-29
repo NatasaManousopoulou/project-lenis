@@ -13,6 +13,7 @@ const REPOSITORY_QUERY = `query ($repository_owner:String!, $repository_name:Str
             id
         }
         forkCount
+        parent { nameWithOwner }
         stargazers {
             totalCount
         }

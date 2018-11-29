@@ -41,7 +41,7 @@ function processResult(graph, context) {
 
   context.log("Processed page " + context.pageNumber++ + ", found " + num + " entries");
 
-  if (graph.data.search.pageInfo.hasNextPage && !process.env.DISABLE_PAGING) {
+  if (graph.data.search.pageInfo.hasNextPage) {
       executeQuery(graph.data.search.pageInfo.endCursor, context);
   } else {
     context.bindings.githubRepositoriesStep2 = JSON.stringify(result.organizations)
