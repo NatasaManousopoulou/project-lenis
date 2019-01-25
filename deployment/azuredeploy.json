@@ -185,6 +185,10 @@
             {
               "name": "WEBSITE_MAX_DYNAMIC_APPLICATION_SCALE_OUT",
               "value": "1"
+            },
+            {
+              "name": "PAGE_SIZE",
+              "value": "100"
             }
           ]
         }
