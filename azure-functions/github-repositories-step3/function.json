@@ -24,6 +24,15 @@
           "createIfNotExists": true,
           "connectionStringSetting": "COSMOS_DB_CONNECTION_STRING",     
           "direction": "out"
+        },
+        {
+          "name": "githubRepositoriesDocumentDcUsers",
+          "type": "cosmosDB",
+          "databaseName": "project-lenis",
+          "collectionName": "githubRepositoriesDcUsers",
+          "createIfNotExists": true,
+          "connectionStringSetting": "COSMOS_DB_CONNECTION_STRING",     
+          "direction": "out"
         }
   ],
   "disabled": false
