@@ -1,6 +1,9 @@
 'use strict'
 
+
+let gitHubHelper = require(`../common/githubGraphQL.js`);
 let exceptionHelper = require(`../common/exceptions.js`);
+let contributionsRepositoryQuery = require(`../common/queries/repository.js`).contributionsRepositoryQuery;
 
 function hardcodedIds() {
   return [
@@ -13,8 +16,7 @@ function hardcodedIds() {
     "limorl",
     "omri374",
     "lawrencegripper",
-    "omri374",
-    "rabee333@gmail.com",
+    "rabee333",
     "ilanak",
     "mydiemho",
     "JacopoMangiavacchi",
@@ -24,27 +26,59 @@ function hardcodedIds() {
 }
 
 function executeQuery(context) {
-  var result = context.result;
-
-  hardcodedIds().forEach((id) => {
-    result.organizations.push( {
-      "login": id,
-      "type": "user",
-      "collectionSuffix": "DcUsers"
-    })}
-  );
-
-  context.bindings.githubRepositoriesStep2 = JSON.stringify(result.organizations)
-  context.done();  
+  getContributions(context.login, null, context); 
 }
 
-module.exports = function (context) {
-  try{
+function getContributions(login, endCursor, context) {
+  context.log('Getting repos for ' + login);
 
-      context.result = {}
-      context.result.organizations = [];
-      context.result.dcUsers = [];
+  context.login = login;
+  const variables = JSON.stringify({
+    login: login,
+    end_cursor: endCursor
+  });
+
+  try {
+    gitHubHelper.executeQuery(contributionsRepositoryQuery, variables, processResult, context);
+  } catch (error) {
+    processResult({ error: error }, context);
+  }
+}
+
+function processResult(graph, context) {
+  let result = context.result;
+
+  if (!graph.error) {
+    graph.data.user.repositoriesContributedTo.nodes.forEach(repo => {
+      result.repos.push(repo); 
+      result.user.repos.push(repo.nameWithOwner)
+    });
+
+    if (graph.data.user.repositoriesContributedTo.pageInfo.hasNextPage) {
+        getContributions(context.login, graph.data.user.repositoriesContributedTo.pageInfo.endCursor, context);
+    }
+    else {
+      context.bindings.dcUserContributionsDocument = JSON.stringify(result.repos);
+      context.bindings.dcUsersDocument = JSON.stringify([ result.user ]);
+      context.done();
+    }      
+  }
+}
+
+module.exports = function (context, req) {
+  try {
       context.pageNumber = 0;
+
+      if (req.query.login || (req.body && req.body.login)) {
+        context.login = (req.query.login || req.body.login);
+      }
+      context.result = { 
+        repos: [],
+        user: { 
+          login: context.login, 
+          repos: []
+        }
+      }
       executeQuery(context);
   } catch(error) {
       exceptionHelper.raiseException(error, true, context);

@@ -66,7 +66,45 @@ const COLLABORATED_REPOSITORY_QUERY = `query($login:String!, $end_cursor:String)
     }
   }`
 
+  const CONTRIBUTIONS_REPOSITORY_QUERY = 
+  `query($login:String!, $end_cursor:String) {
+    user(login: $login) {
+    	repositoriesContributedTo(first: 20, after: $end_cursor, includeUserRepositories: true) {
+            pageInfo { 
+                hasNextPage
+                endCursor
+              }
+            nodes {
+                id
+                name
+                nameWithOwner
+                languages(first: 10) { nodes {name } }
+                isFork
+                forkCount
+                stargazers { totalCount }
+                issues { totalCount }
+                watchers { totalCount }
+                createdAt
+                pushedAt
+                pullRequests { totalCount }
+                description
+                owner { login }
+                defaultBranchRef {
+                    target {
+                    ... on Commit {
+                        history(first:100) {
+                        edges { node { author { user { login }}}}
+                        }
+                    }
+                    }
+                }
+                }
+            }
+        }
+    }`
+
 module.exports = {
     repositoryQuery : REPOSITORY_QUERY,
-    collaboratedRepositoryQuery: COLLABORATED_REPOSITORY_QUERY
+    collaboratedRepositoryQuery: COLLABORATED_REPOSITORY_QUERY,
+    contributionsRepositoryQuery: CONTRIBUTIONS_REPOSITORY_QUERY,
 }
